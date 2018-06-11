@@ -1,8 +1,7 @@
 #!/bin/bash
 
 export WSKCLI=${WSK_CLI:=wsk}
-
-#################################################### 
+export WSKLOG=${WSK_INVOKER_LOG:=/tmp/wsklogs/invoker0/invoker0_logs.log}
 
 export DEBUG=${DEBUG:=}
 if [[ -n $DEBUG ]]; then
@@ -44,32 +43,59 @@ usage()
 
 function countContainers
 {
-	extra=""
+  extra=""
   if [[ $# -gt 0 ]]; then
     for i in "$@"; do
       extra="$extra | grep $i "
     done
   fi
-  cmd="docker ps $extra | wc -l"
-	bash -c "$cmd"
+  cmd="docker ps | grep whisk $extra | wc -l"
+  bash -c "$cmd"
 }
 
 function showContainers
 {
-	extra=""
+  extra=""
   if [[ $# -gt 0 ]]; then
     for i in "$@"; do
       extra="$extra | grep $i "
     done
   fi
   cmd="docker ps $extra "
-	bash -c "$cmd"
+  bash -c "$cmd"
 }
 
 function wskInvoke
 {
-	cmd="$WSKCLI -i action invoke $@"
-	bash -c "$cmd"
+  cmd="$WSKCLI -i action invoke $@"
+  bash -c "$cmd"
+}
+
+function streamLog 
+{
+  cmd="tail -f $WSKLOG"
+  bash -c "$cmd"
+}
+
+function showStarts
+{
+  extra=""
+  if [[ $# -gt 0 ]]; then
+    for i in "$@"; do
+      extra="$extra | grep $i "
+    done
+  fi
+  cmd="grep containerState $WSKLOG $extra "
+  bash -c "$cmd"
+}
+
+function countStarts
+{
+  echo -e "cold:\t\t" $( showStarts cold | wc -l )
+  echo -e "prewarm:\t" $( showStarts prewarm | wc -l )
+  echo -e "warm:\t\t" $( showStarts warm | wc -l )
+
+
 }
 
 #################################################### 
