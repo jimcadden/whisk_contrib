@@ -2,6 +2,7 @@
 
 export WSKCLI=${WSK_CLI:=wsk}
 export WSKLOG=${WSK_INVOKER_LOG:=/tmp/wsklogs/invoker0/invoker0_logs.log}
+export TMPDIR=${TMP_DIR:=/tmp}
 
 export DEBUG=${DEBUG:=}
 if [[ -n $DEBUG ]]; then
@@ -65,12 +66,6 @@ function showContainers
   bash -c "$cmd"
 }
 
-function wskInvoke
-{
-  cmd="$WSKCLI -i action invoke $@"
-  bash -c "$cmd"
-}
-
 function streamLog 
 {
   cmd="tail -f $WSKLOG"
@@ -94,8 +89,26 @@ function countStarts
   echo -e "cold:\t\t" $( showStarts cold | wc -l )
   echo -e "prewarm:\t" $( showStarts prewarm | wc -l )
   echo -e "warm:\t\t" $( showStarts warm | wc -l )
+}
 
+function wskAction
+{
+  cmd="$WSKCLI -i action $@"
+  bash -c "$cmd"
+}
 
+function randomFunction
+{
+	seed=$RANDOM
+	file="$TMPDIR/wsk_func_$RANDOM.js"
+	touch $file
+  cat << EOF >> $file
+function main() {
+    return {payload: 'RANDOM $seed'};
+}
+EOF
+  wskAction create $seed $file 
+	rm $file
 }
 
 #################################################### 
