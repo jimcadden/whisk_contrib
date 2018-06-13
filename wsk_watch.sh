@@ -107,8 +107,30 @@ function main() {
     return {payload: 'RANDOM $seed'};
 }
 EOF
-  wskAction create $seed $file 
+  wskAction create $seed $file > /dev/null
+  if [ $? -eq 0 ]; then
+		echo $seed
+	fi
 	rm $file
+}
+
+function getInvokeTime
+{
+
+	init_t=0
+	wait_t=0
+	run_t=0
+  OUTPUT=$(bash -c "$WSKCLI -i action invoke -b $@ | tail -n +2")
+	len=$(echo $OUTPUT | jq -r '.annotations | length') 
+	run_t=$( echo $OUTPUT | jq -r '.duration' )
+	if [[ $len -eq 4 ]]; then # WARM/HOT START 
+		wait_t=$( echo $OUTPUT | jq -r '.annotations' | jq -r '.[3]' | jq -r '.value' )
+	elif [[ $len -eq 5 ]]; then #COLD START
+		wait_t=$( echo $OUTPUT | jq -r '.annotations' | jq -r '.[1]' | jq -r '.value' )
+		init_t=$( echo $OUTPUT | jq -r '.annotations' | jq -r '.[4]' | jq -r '.value' )
+	fi
+	
+	echo $wait_t $init_t $run_t 
 }
 
 #################################################### 
