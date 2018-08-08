@@ -1,3 +1,7 @@
 [submodule "openwhisk-bench"]
 	path = openwhisk-bench
 	url = git@github.com:SESA/openwhisk-bench.git
+[submodule "incubator-openwhisk"]
+	path = incubator-openwhisk
+	url = https://github.com/jmcadden/incubator-openwhisk
+    	branch = seuss
