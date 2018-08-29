@@ -8,16 +8,24 @@
 ######################################################################
 
 export WSKROOT=${WSK_ROOT:=$HOME/incubator-openwhisk}
-export WSKENV=${WSK_ENV:=seuss}
+export WSKENV=${WSK_ENV:=local}
 export ANSBL=$WSKROOT/ansible
 export ENVROOT=$ANSBL/environments/$WSKENV
+
+export SEUSS=${SEUSS:=}
+
+if [[ ! -z $SEUSS ]]
+then
+	echo "********** SEUSS ENABLED **********"
+	export MOD="-seuss"
+fi
 
 echo "OpenWhisk deployment control:$ENVROOT"
 
 function Shutdown 
 {
-  echo "Shutting down OpenWhisk..."
-  ansible-playbook -i $ENVROOT $ANSBL/openwhisk.yml -e mode=clean
+  echo "Shutting down OpenWhisk$MOD..."
+  ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml -e mode=clean
   ansible-playbook -i $ENVROOT $ANSBL/apigateway.yml -e mode=clean
   ansible-playbook -i $ENVROOT $ANSBL/couchdb.yml -e mode=clean
   echo "Finished."
@@ -31,22 +39,15 @@ function Boot
   ansible-playbook -i $ENVROOT $ANSBL/initdb.yml
   ansible-playbook -i $ENVROOT $ANSBL/wipe.yml        
   ansible-playbook -i $ENVROOT $ANSBL/apigateway.yml    
-  ansible-playbook -i $ENVROOT $ANSBL/openwhisk.yml     
-  ansible-playbook -i $ENVROOT $ANSBL/postdeploy.yml
-  echo "Finished."
-}
-
-function Install 
-{
-  echo "Installing OpenWhisk..."
-  echo "TODO!"
+  ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml     
   echo "Finished."
 }
 
 function Reboot 
 {
   echo "Redeploying OpenWhisk..."
-  ansible-playbook -i $ENVROOT $ANSBL/openwhisk.yml     
+  ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml -e mode=clean
+  ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml     
   echo "Finished."
 }
 
