@@ -58,15 +58,10 @@ function Reboot
 }
 
 function Clean {
-  echo "Removing EbbRT native containers..." docker ps | grep ebbrt - 0 |
-      cut - d ' ' - f 1 | while read id;
-  do
-    docker rm - f $id;
-  done echo "Removing EbbRT networks..." docker network ls | grep ebbrt - 0 |
-      cut - d ' ' - f 9 | while read id;
-  do
-    docker network rm $id;
-  done
+  echo "Removing EbbRT native containers..." 
+	docker ps | grep ebbrt-0 | cut - d ' ' - f 1 | while read id; do docker rm - f $id; done
+  echo "Removing EbbRT networks..." 
+	docker network ls | grep ebbrt-0 | cut - d ' ' - f 9 | while read id; do docker network rm $id; done
 }
 
 ######################################################################
