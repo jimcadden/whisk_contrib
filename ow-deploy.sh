@@ -28,6 +28,9 @@ function Shutdown
   ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml -e mode=clean
   ansible-playbook -i $ENVROOT $ANSBL/apigateway.yml -e mode=clean
   ansible-playbook -i $ENVROOT $ANSBL/couchdb.yml -e mode=clean
+if [[ ! -z $SEUSS ]]; then
+	CleanEbbRT
+fi
   echo "Finished."
 }
 
@@ -47,8 +50,23 @@ function Reboot
 {
   echo "Redeploying OpenWhisk..."
   ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml -e mode=clean
+	if [[ ! -z $SEUSS ]]; then
+		Clean
+	fi
   ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml     
   echo "Finished."
+}
+
+function Clean {
+  echo "Removing EbbRT native containers..." docker ps | grep ebbrt - 0 |
+      cut - d ' ' - f 1 | while read id;
+  do
+    docker rm - f $id;
+  done echo "Removing EbbRT networks..." docker network ls | grep ebbrt - 0 |
+      cut - d ' ' - f 9 | while read id;
+  do
+    docker network rm $id;
+  done
 }
 
 ######################################################################
