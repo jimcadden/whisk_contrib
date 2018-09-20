@@ -8,7 +8,7 @@
 ######################################################################
 
 export WSKROOT=${WSK_ROOT:=$HOME/incubator-openwhisk}
-export WSKENV=${WSK_ENV:=local}
+export WSKENV=${WSK_ENV:=kumo}
 export ANSBL=$WSKROOT/ansible
 export ENVROOT=$ANSBL/environments/$WSKENV
 
@@ -29,7 +29,7 @@ function Shutdown
   ansible-playbook -i $ENVROOT $ANSBL/apigateway.yml -e mode=clean
   ansible-playbook -i $ENVROOT $ANSBL/couchdb.yml -e mode=clean
 if [[ ! -z $SEUSS ]]; then
-	CleanEbbRT
+	Clean
 fi
   echo "Finished."
 }
@@ -59,9 +59,9 @@ function Reboot
 
 function Clean {
   echo "Removing EbbRT native containers..." 
-	docker ps | grep ebbrt-0 | cut - d ' ' - f 1 | while read id; do docker rm - f $id; done
+	docker ps | grep ebbrt-0 | cut -d ' ' -f 1 | while read id; do docker rm -f $id; done
   echo "Removing EbbRT networks..." 
-	docker network ls | grep ebbrt-0 | cut - d ' ' - f 9 | while read id; do docker network rm $id; done
+	docker network ls | grep ebbrt-0 | cut -d ' ' -f 9 | while read id; do docker network rm $id; done
 }
 
 ######################################################################
