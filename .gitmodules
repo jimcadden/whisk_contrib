@@ -1,3 +1,4 @@
 [submodule "openwhisk-bench"]
 	path = openwhisk-bench
 	url = git@github.com:SESA/openwhisk-bench.git
+	ignore = dirty
