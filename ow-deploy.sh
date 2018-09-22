@@ -8,7 +8,7 @@
 ######################################################################
 
 export WSKROOT=${WSK_ROOT:=$HOME/incubator-openwhisk}
-export WSKENV=${WSK_ENV:=kumo}
+export WSKENV=${WSK_ENV:=local}
 export ANSBL=$WSKROOT/ansible
 export ENVROOT=$ANSBL/environments/$WSKENV
 
@@ -16,9 +16,16 @@ export SEUSS=${SEUSS:=}
 
 if [[ ! -z $SEUSS ]]
 then
-	echo "********** SEUSS ENABLED **********"
-	export MOD="-seuss"
+	if [[ ! -z $DEBUG ]]
+	then
+		echo "********** SEUSS DEBUG ENABLED **********"
+		export MOD="-seuss_debug"
+	else
+	  echo "********** SEUSS ENABLED **********"
+	  export MOD="-seuss"
+	fi
 fi
+
 
 echo "OpenWhisk deployment control:$ENVROOT"
 
@@ -57,7 +64,8 @@ function Reboot
   echo "Finished."
 }
 
-function Clean {
+function Clean 
+{
   echo "Removing EbbRT native containers..." 
 	docker ps | grep ebbrt-0 | cut -d ' ' -f 1 | while read id; do docker rm -f $id; done
   echo "Removing EbbRT networks..." 
