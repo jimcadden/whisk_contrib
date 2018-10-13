@@ -8,7 +8,7 @@
 ######################################################################
 
 export WSKROOT=${WSK_ROOT:=$HOME/incubator-openwhisk}
-export WSKENV=${WSK_ENV:=local}
+export WSKENV=${WSK_ENV:=moc}
 export ANSBL=$WSKROOT/ansible
 export ENVROOT=$ANSBL/environments/$WSKENV
 
@@ -50,6 +50,8 @@ function Boot
   ansible-playbook -i $ENVROOT $ANSBL/wipe.yml        
   ansible-playbook -i $ENVROOT $ANSBL/apigateway.yml    
   ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml     
+  echo "Sleeping for 1 min to allow everything to initialize..."
+  sleep 60
   echo "Finished."
 }
 
@@ -61,6 +63,8 @@ function Reboot
 		Clean
 	fi
   ansible-playbook -i $ENVROOT $ANSBL/openwhisk$MOD.yml     
+  echo "Sleeping for 1 min to allow everything to initialize..."
+  sleep 60
   echo "Finished."
 }
 
