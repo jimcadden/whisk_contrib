@@ -1,1 +1,4 @@
 ulimit -n 4196
+go run *.go -cf 16 execDockerFile docker/conts1500.csv
+go run *.go --create execOWFile trials/test/8192_1u.csv
+vim range loop: ":for i in range(1,10) | put ='192.168.0.'.i | endfor"
