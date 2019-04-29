@@ -15,7 +15,7 @@ export ENVROOT=$ANSBL/environments/$WSKENV
 export VMIP=${VM_IP:=10.22.22.145}
 export VMHOSTIP=${VM_HOST_IP:=10.22.22.144}
 export CNTRIP=${CNTR_IP:=10.22.22.100}
-export BENCHIP=${BENCH_IP:=10.22.22.22}
+export BENCHIP=${BENCH_IP:=10.22.22.100}
 # ENABLE/DISBALE SEUSS
 export SEUSS=${SEUSS:=}
 if [[ ! -z $SEUSS ]]; then
@@ -106,6 +106,21 @@ function Clean
 #	docker ps | grep ebbrt-0 | cut -d ' ' -f 1 | while read id; do docker rm -f $id; done
   echo "Removing EbbRT networks..." 
 #	docker network ls | grep ebbrt-0 | cut -d ' ' -f 9 | while read id; do docker network rm $id; done
+}
+
+function countContainerLoop
+{
+count=0
+while true;
+do
+if [ ! -z $LINUX ]; then
+	now=$(date +%s%N)
+	c=$(ssh $VMIP /root/whisk_contrib/ow-bench.sh countContainers node)
+	echo ${count},${now},${c}
+	(( count++ ))
+	sleep 0.1
+fi
+done
 }
 
 function SyncClocks
